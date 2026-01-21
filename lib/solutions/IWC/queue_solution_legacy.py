@@ -156,10 +156,10 @@ class Queue:
             bank_penalty= 0 if is_bank_old else (1 if is_bank else 0)
 
             return (
-                timestamp
-                , bank_penalty
-                , priority
+                priority
                 , earliest
+                , bank_penalty
+                , timestamp
             )
         self._queue.sort(key=sort_task)
         # self._queue.sort(
@@ -276,4 +276,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
