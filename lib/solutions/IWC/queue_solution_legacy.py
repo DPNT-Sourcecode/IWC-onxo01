@@ -175,8 +175,13 @@ class Queue:
         return len(self._queue)
 
     @property
-    def age(self):
-        return 0
+    def age(self) -> int:
+        if not self._queue:
+            return 0
+        times= (self._timestamp_for_task(t) for t in self._queue)
+        oldest= min(times)
+        newest= max(times)
+        return int((newest - oldest).total_seconds())
 
     def purge(self):
         self._queue.clear()
@@ -265,3 +270,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
