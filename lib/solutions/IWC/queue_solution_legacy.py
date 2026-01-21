@@ -153,8 +153,13 @@ class Queue:
             task_internal_age= (newest_timestamp-timestamp).total_seconds()
             is_bank_old= is_bank and task_internal_age >= 300
 
-            bank_penalty= 0 if is_bank_old else (1 if is_bank else 0)
+            bank_penalty= 1 if (is_bank and not is_bank_old) else 0
             priority_rank= 0 if priority == Priority.HIGH else 1
+            if is_bank and not is_bank_old:
+                return(
+                    1,
+                    timestamp
+                )
             return (
                 timestamp
                 , bank_penalty
@@ -276,6 +281,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
