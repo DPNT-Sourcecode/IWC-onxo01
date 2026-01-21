@@ -178,7 +178,7 @@ class Queue:
     def age(self) -> int:
         if not self._queue:
             return 0
-        times= (self._timestamp_for_task(t) for t in self._queue)
+        times= [self._timestamp_for_task(t) for t in self._queue]
         oldest= min(times)
         newest= max(times)
         return int((newest - oldest).total_seconds())
@@ -270,4 +270,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
