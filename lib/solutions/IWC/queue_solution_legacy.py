@@ -145,7 +145,7 @@ class Queue:
             priority= self._priority_for_task(task)
 
             global_penalty_bank =1 if (is_bank and task_count[task.user_id] < 3) else 0
-            bank_in_limit= 1 if (is_bank and priority == Priority.HIGH) else 0 
+            bank_in_limit= 1 if (is_bank and task_count[task.user_id] >= 3) else 0 
 
             return (
                 global_penalty_bank
@@ -258,4 +258,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
