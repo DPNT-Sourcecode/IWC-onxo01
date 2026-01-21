@@ -141,21 +141,35 @@ class Queue:
                 metadata["group_earliest_timestamp"] = current_earliest
                 metadata["priority"] = priority_level
         def sort_task(task):
-            is_bank= task.provider == "bank_statements"
             priority= self._priority_for_task(task)
-
-            global_penalty_bank =1 if (is_bank and task_count[task.user_id] < 3) else 0
-            bank_in_limit= 1 if (is_bank and task_count[task.user_id] >= 3) else 0 
+            earliest= self._earliest_group_timestamp_for_task(task)
+            timestamp= self._timestamp_for_task(task)
+            
+            user_tasks= [t for t in self._queue if t.user_id == task.user_id]
+            has_other_tasks= any(t.provider != "bank_statements" for t in user_tasks)
+            global_penalty_bank =1 if (task.provider == "bank_statements"
+                                       and len(user_tasks)< 3 
+                                       and has_other_tasks
+            ) else 0
+            bank_in_limit= 1 if (task.provider == "bank_statements"
+                                  and len(user_tasks)>= 3 
+            ) else 0 
 
             return (
                 global_penalty_bank
                 , priority
-                , self._earliest_group_timestamp_for_task(task)
+                , earliest
                 , bank_in_limit
-                , self._timestamp_for_task(task)
+                , timestamp
             )
-        self._queue.sort(key=sort_task
-        )
+        self._queue.sort(key=sort_task)
+        # self._queue.sort(
+        #     key= lambda i: (
+        #         self._priority_for_task(i),
+        #         self._earliest_group_timestamp_for_task(i),
+        #         self._timestamp_for_task(i),
+        #     )
+        # )
 
         task = self._queue.pop(0)
         return TaskDispatch(
@@ -258,5 +272,3 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
-
-
