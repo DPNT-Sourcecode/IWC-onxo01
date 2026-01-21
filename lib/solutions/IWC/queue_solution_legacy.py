@@ -147,21 +147,12 @@ class Queue:
             
             is_bank= task.provider == "bank_statements"
 
-            user_tasks= [t for t in self._queue if t.user_id == task.user_id]
-            has_other_tasks= any(t.provider != "bank_statements" for t in user_tasks)
-            global_penalty_bank =1 if (is_bank
-                                       and len(user_tasks)< 3 
-                                       and has_other_tasks
-            ) else 0
-            bank_in_limit= 1 if (is_bank
-                                  and priority== Priority.HIGH
-            ) else 0 
+            bank_penalty= 1 if is_bank else 0
 
             return (
-                global_penalty_bank
-                , 0 if priority == Priority.HIGH else 1
+                priority
                 , earliest
-                , bank_in_limit
+                , bank_penalty
                 , timestamp
             )
         self._queue.sort(key=sort_task)
@@ -274,4 +265,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
