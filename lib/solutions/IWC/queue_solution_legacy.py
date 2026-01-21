@@ -163,17 +163,16 @@ class Queue:
                     hold_bank_global= 1
                 else:
                     hold_bank_after_user_tasks= 1
-            effective_timestamp= (timestamp if is_bank_old else MAX_TIMESTAMP if hold_bank_global else timestamp)       
+            effective_timestamp= MAX_TIMESTAMP if hold_bank_global else timestamp    
 
-            priority_rank= 0 if is_bank_old else (0 if priority == Priority.HIGH else 1)
-            old_bank_change= 0 if is_bank_old else 1
+            priority_rank = priority.value
             
             return (
                 effective_timestamp
-                , old_bank_change
+                , hold_bank_after_user_tasks
                 , priority_rank
                 , earliest
-                , hold_bank_after_user_tasks 
+            
             )
         self._queue.sort(key=sort_task)
         # self._queue.sort(
@@ -290,5 +289,6 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
