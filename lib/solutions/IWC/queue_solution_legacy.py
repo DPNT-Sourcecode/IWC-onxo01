@@ -155,11 +155,7 @@ class Queue:
 
             bank_penalty= 1 if (is_bank and not is_bank_old) else 0
             priority_rank= 0 if priority == Priority.HIGH else 1
-            if is_bank and not is_bank_old:
-                return(
-                    1,
-                    timestamp
-                )
+            
             return (
                 timestamp
                 , bank_penalty
@@ -281,8 +277,3 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
-
-
-
-
-
