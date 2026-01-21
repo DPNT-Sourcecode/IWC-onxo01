@@ -142,7 +142,9 @@ class Queue:
                 metadata["priority"] = priority_level
 
         newest_timestamp= max(self._timestamp_for_task(t) for t in self._queue)
-
+        task_count= {}
+        for t in self._queue:
+            task_count[t.user_id]= task_count.get(t.user_id, 0) +1
 
         def sort_task(task):
             priority= self._priority_for_task(task)
@@ -153,12 +155,14 @@ class Queue:
             task_internal_age= (newest_timestamp-timestamp).total_seconds()
             is_bank_old= is_bank and task_internal_age >= 300
 
-            bank_penalty= 1 if (is_bank and not is_bank_old) else 0
+            hold_bank_back_global= 1 if (is_bank and not is_bank_old and task_count[task.user_id]<3)else 0
+            bank_after_user_tasks= 1 if (is_bank and task_count[task.user_id] >= 3) else 0
             priority_rank= 0 if priority == Priority.HIGH else 1
             
             return (
-                timestamp
-                , bank_penalty
+                hold_bank_back_global
+                , timestamp
+                , bank_after_user_tasks
                 , priority_rank
                 , earliest
             )
@@ -277,3 +281,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
