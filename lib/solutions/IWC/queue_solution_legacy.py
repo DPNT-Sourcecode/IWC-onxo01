@@ -155,16 +155,20 @@ class Queue:
             task_internal_age= (newest_timestamp-timestamp).total_seconds()
             is_bank_old= is_bank and task_internal_age >= 300
 
-            hold_bank_back_global= 1 if (is_bank and not is_bank_old and task_count[task.user_id]<3)else 0
-            bank_after_user_tasks= 1 if (is_bank and (not is_bank_old)  and task_count[task.user_id] >= 3) else 0
+            effective_timestamp= timestamp
+            if is_bank and not is_bank_old:
+                effective_timestamp=timestamp
+
             priority_rank= 0 if priority == Priority.HIGH else 1
+            old_bank_change= 0 if is_bank_old else 1
+            
             
             return (
-                hold_bank_back_global
+                effective_timestamp
+                , old_bank_change
                 , priority_rank
                 , earliest
-                , bank_after_user_tasks
-                , timestamp
+                
                 
             )
         self._queue.sort(key=sort_task)
@@ -282,5 +286,6 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
