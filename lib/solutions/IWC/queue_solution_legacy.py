@@ -140,13 +140,21 @@ class Queue:
             else:
                 metadata["group_earliest_timestamp"] = current_earliest
                 metadata["priority"] = priority_level
+        def sort_task(task):
+            is_bank= task.provider == "bank_statements"
+            priority= self._priority_for_task(task)
 
-        self._queue.sort(
-            key=lambda i: (
-                self._priority_for_task(i),
-                self._earliest_group_timestamp_for_task(i),
-                self._timestamp_for_task(i),
+            global_penalty_bank =1 if (is_bank and task_count[task.user_id] < 3) else 0
+            bank_in_limit= 1 if (is_bank and priority == Priority.HIGH) else 0 
+
+            return (
+                global_penalty_bank
+                , priority
+                , self._earliest_group_timestamp_for_task(task)
+                , bank_in_limit
+                , self._timestamp_for_task(task)
             )
+        self._queue.sort(key=sort_task
         )
 
         task = self._queue.pop(0)
@@ -250,3 +258,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
