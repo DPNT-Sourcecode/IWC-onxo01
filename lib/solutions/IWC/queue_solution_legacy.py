@@ -125,23 +125,36 @@ class Queue:
 
         for task in self._queue:
             metadata = task.metadata
-            current_earliest = metadata.get("group_earliest_timestamp", MAX_TIMESTAMP)
-            raw_priority = metadata.get("priority")
-            try:
-                priority_level = Priority(raw_priority)
-            except (TypeError, ValueError):
-                priority_level = None
+            uid= task.user_id
+            is_bank= task.provider == "bank_statements"
 
-            if priority_level is None or priority_level == Priority.NORMAL:
+            if is_bank:
+                metadata["priority"] = Priority.NORMAL
                 metadata["group_earliest_timestamp"] = MAX_TIMESTAMP
-                if task_count[task.user_id] >= 3:
-                    metadata["group_earliest_timestamp"] = priority_timestamps[task.user_id]
-                    metadata["priority"] = Priority.HIGH
-                else:
-                    metadata["priority"] = Priority.NORMAL
+                continue
+            if task_count[uid] >= 3:
+                metadata["group_earliest_timestamp"] = priority_timestamps[uid]
+                metadata["priority"]= Priority.HIGH
             else:
-                metadata["group_earliest_timestamp"] = current_earliest
-                metadata["priority"] = priority_level
+                metadata["group_earliest_timestamp"] = MAX_TIMESTAMP
+                metadata["priority"] = Priority.NORMAL
+            # current_earliest = metadata.get("group_earliest_timestamp", MAX_TIMESTAMP)
+            # raw_priority = metadata.get("priority")
+            # try:
+            #     priority_level = Priority(raw_priority)
+            # except (TypeError, ValueError):
+            #     priority_level = None
+
+            # if priority_level is None or priority_level == Priority.NORMAL:
+            #     metadata["group_earliest_timestamp"] = MAX_TIMESTAMP
+            #     if task_count[task.user_id] >= 3:
+            #         metadata["group_earliest_timestamp"] = priority_timestamps[task.user_id]
+            #         metadata["priority"] = Priority.HIGH
+            #     else:
+            #         metadata["priority"] = Priority.NORMAL
+            # else:
+            #     metadata["group_earliest_timestamp"] = current_earliest
+            #     metadata["priority"] = priority_level
 
        
         global_earliest_stamp= min(self._timestamp_for_task(t) for t in self._queue)
@@ -291,4 +304,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
