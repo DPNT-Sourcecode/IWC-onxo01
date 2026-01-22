@@ -159,7 +159,7 @@ class Queue:
                 priority_rank = int(Priority.NORMAL)
                 earliest_rank= MAX_TIMESTAMP
             else:
-                priority_rank= int(Priority.value)
+                priority_rank= int(priority.value)
                 earliest_rank=earliest
             
             bank_penalty= 1 if (is_bank and not is_bank_old and timestamp>global_earliest_stamp) else 0
@@ -291,3 +291,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
