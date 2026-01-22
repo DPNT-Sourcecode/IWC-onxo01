@@ -180,10 +180,10 @@ class Queue:
             old_bank_change= 1 if is_bank_old else 2
             
             return (
-                timestamp
-                , priority_rank
+                priority_rank
                 , old_bank_change
                 , bank_penalty
+                , timestamp
                 , earliest_rank
                 , task.user_id
                 , task.provider
@@ -304,5 +304,6 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
