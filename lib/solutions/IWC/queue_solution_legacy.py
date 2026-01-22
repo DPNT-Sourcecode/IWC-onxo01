@@ -143,10 +143,7 @@ class Queue:
                 metadata["group_earliest_timestamp"] = current_earliest
                 metadata["priority"] = priority_level
 
-        # newest_timestamp= max(self._timestamp_for_task(t) for t in self._queue)
-        task_count= {}
-        for t in self._queue:
-            task_count[t.user_id]= task_count.get(t.user_id, 0) +1
+       
         global_earliest_stamp= min(self._timestamp_for_task(t) for t in self._queue)
         newest_timestamp= max(self._timestamp_for_task(t) for t in self._queue)
         def sort_task(task):
@@ -158,20 +155,23 @@ class Queue:
             task_internal_age= (newest_timestamp-timestamp).total_seconds()
             is_bank_old= is_bank and task_internal_age >= 300
             
-            grouped_tasks= task_count.get(task.user_id, 0) >= 3
-
+            if is_bank:
+                priority_rank = int(Priority.NORMAL)
+                earliest_rank= MAX_TIMESTAMP
+            else:
+                priority_rank= int(Priority.value)
+                earliest_rank=earliest
             
-            bank_user_penalty= 1 if (is_bank and grouped_tasks and not is_bank_old) else 0
-            bank_global= 1 if (is_bank and (not grouped_tasks) and not is_bank_old) else 0
-            priority_rank= int(priority.NORMAL) if is_bank else int(priority.value)
-            earliest_rank= MAX_TIMESTAMP if is_bank else earliest
+            bank_penalty= 1 if (is_bank and not is_bank_old and timestamp>global_earliest_stamp) else 0
+            
+            old_bank_change= 1 if is_bank_old else 2
             
             return (
-                priority_rank
+                timestamp
+                , priority_rank
+                , old_bank_change
+                , bank_penalty
                 , earliest_rank
-                , bank_user_penalty
-                , bank_global 
-                , timestamp
                 , task.user_id
                 , task.provider
             
