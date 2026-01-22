@@ -167,8 +167,8 @@ class Queue:
             return (
                 timestamp
                 , priority_rank
-                , earliest
                 , bank_penalty
+                , earliest
                 , task.user_id
                 , task.provider
             
@@ -288,6 +288,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
