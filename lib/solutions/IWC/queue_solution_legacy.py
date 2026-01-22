@@ -145,11 +145,16 @@ class Queue:
         task_count= {}
         for t in self._queue:
             task_count[t.user_id]= task_count.get(t.user_id, 0) +1
-
+        def _as_dt(x):
+            if isinstance(x, datetime):
+                return x
+            if isinstance(x, str):
+                return datetime.strptime(x, "%Y-%m-%d %H:%M:%S")
+            raise TypeError(f"unexpected timestamp type")
         def sort_task(task):
             priority= self._priority_for_task(task)
-            earliest= self._earliest_group_timestamp_for_task(task)
-            timestamp= self._timestamp_for_task(task)
+            earliest= _as_dt(self._earliest_group_timestamp_for_task(task))
+            timestamp= _as_dt(self._timestamp_for_task(task))
             
             is_bank= task.provider == "bank_statements"
             task_internal_age= (newest_timestamp-timestamp).total_seconds()
@@ -279,3 +284,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
