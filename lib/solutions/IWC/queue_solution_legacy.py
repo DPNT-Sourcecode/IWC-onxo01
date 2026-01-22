@@ -145,7 +145,7 @@ class Queue:
                 metadata["group_earliest_timestamp"] = current_earliest
                 metadata["priority"] = priority_level
 
-        newest_timestamp= max(self._timestamp_for_task(t) for t in self._queue)
+        # newest_timestamp= max(self._timestamp_for_task(t) for t in self._queue)
         task_count= {}
         for t in self._queue:
             task_count[t.user_id]= task_count.get(t.user_id, 0) +1
@@ -286,3 +286,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
