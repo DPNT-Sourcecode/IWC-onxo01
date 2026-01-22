@@ -162,17 +162,16 @@ class Queue:
                 and timestamp>global_earliest_stamp
             )
             
-            if is_bank_old:
-                bank_penalty=0
-            else:
-                bank_penalty=1 if apply_pen_bank else 0
+            bank_penalty= 1 if apply_pen_bank else 0
             priority_rank= int(priority.value)
+            old_bank_change= 0 if is_bank_old else 1
             
             return (
                 timestamp
+                , old_bank_change
                 , priority_rank
-                , earliest
                 , bank_penalty
+                , earliest
                 , task.user_id
                 , task.provider
             
@@ -292,4 +291,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
