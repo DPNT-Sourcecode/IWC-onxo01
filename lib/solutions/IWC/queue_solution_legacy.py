@@ -138,6 +138,7 @@ class Queue:
             else:
                 metadata["group_earliest_timestamp"] = MAX_TIMESTAMP
                 metadata["priority"] = Priority.NORMAL
+            task.metadata= metadata
             # current_earliest = metadata.get("group_earliest_timestamp", MAX_TIMESTAMP)
             # raw_priority = metadata.get("priority")
             # try:
@@ -307,6 +308,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
