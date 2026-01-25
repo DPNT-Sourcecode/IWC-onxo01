@@ -115,13 +115,18 @@ class Queue:
 
         user_ids = {task.user_id for task in self._queue}
         task_count = {}
+        earliest_ts= {}
+        latest_ts= {}
         priority_timestamps = {}
         for user_id in user_ids:
             user_tasks = [t for t in self._queue if t.user_id == user_id]
             # earliest_timestamp = sorted(user_tasks, key=lambda t: t.timestamp)[0].timestamp
             earliest_timestamp= min(self._timestamp_for_task(t) for t in user_tasks)
+            timestamps= [self._timestamp_for_task(t) for t in user_tasks]
             priority_timestamps[user_id] = earliest_timestamp
             task_count[user_id] = len(user_tasks)
+            earliest_ts[user_id]= min(timestamps)
+            latest_ts[user_id]= max(timestamps)
 
         for task in self._queue:
             metadata = task.metadata
@@ -169,14 +174,16 @@ class Queue:
             is_bank_old= is_bank and task_internal_age >= 300
             
             grouped_user= (task.metadata.get("group_earliest_timestamp", MAX_TIMESTAMP) != MAX_TIMESTAMP)
-            
+            bank_is_last_user= (timestamp == latest_ts[user_id])
             # bank_new= 1 if (is_bank and not is_bank_old ) else 0
             # bank_old= 0 if is_bank_old else 1
             apply_bp= (
                 is_bank
                 and not is_bank_old
-                and (grouped_user or timestamp>global_earliest_stamp)
-            )
+                and ((grouped_user and not bank_is_last_user)
+                or
+                      ((not grouped_user) and timestamp>global_earliest_stamp)
+            ))
             effective_Ts= newest_timestamp if apply_bp else timestamp            
             # old_bank_change= 1 if is_bank_old else 2
             
@@ -302,3 +309,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
