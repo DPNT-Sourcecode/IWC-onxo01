@@ -177,8 +177,7 @@ class Queue:
                 and not is_bank_old
                 and (grouped_user or timestamp>global_earliest_stamp)
             )
-            base_ts= earliest if grouped_user else timestamp
-            effective_Ts= newest_timestamp if apply_bp else base_ts            
+            effective_Ts= newest_timestamp if apply_bp else timestamp            
             # old_bank_change= 1 if is_bank_old else 2
             
             return (
@@ -303,6 +302,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
