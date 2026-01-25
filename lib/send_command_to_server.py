@@ -67,7 +67,7 @@ runner = QueueBasedImplementationRunnerBuilder()\
     .with_solution_for('inventory_get', entry_point_mapping.inventory_get)\
     .with_solution_for('inventory_size', entry_point_mapping.inventory_size)\
     .with_solution_for('letter_to_santa', entry_point_mapping.letter_to_santa)\
-    .with_solution_for('rabbit_hole', entry_point_mapping.rabbit_hole) \
+    .with_solution_for('rabbit_dhole', entry_point_mapping.rabbit_hole) \
     .with_solution_for('render_house', entry_point_mapping.render_house) \
     .with_solution_for('sum', entry_point_mapping.sum)\
     .with_solution_for('to_uppercase', entry_point_mapping.to_uppercase)\
@@ -85,3 +85,4 @@ ChallengeSession\
     .with_config(Utils.get_config())\
     .with_action_provider(lambda: get_user_input(sys.argv[1:]))\
     .start()
+
