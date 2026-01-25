@@ -176,19 +176,17 @@ class Queue:
                 priority_rank= int(priority.value)
                 earliest_rank=earliest
             
-            bank_new= 1 if (is_bank and not is_bank_old ) else 0
-            bank_old= 0 if is_bank_old else 1
-            # bank_penalty= 1 if (is_bank and not is_bank_old and timestamp>global_earliest_stamp) else 0
+            # bank_new= 1 if (is_bank and not is_bank_old ) else 0
+            # bank_old= 0 if is_bank_old else 1
+            bank_penalty= 1 if (is_bank and not is_bank_old and timestamp>global_earliest_stamp) else 0
             
             # old_bank_change= 1 if is_bank_old else 2
             
             return (
-                timestamp
-                , priority_rank
-                , bank_new
-                , bank_old
-                , timestamp
+                priority_rank
                 , earliest_rank
+                , bank_penalty
+                , timestamp
                 , task.user_id
                 , task.provider
             
@@ -308,3 +306,4 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
