@@ -130,14 +130,13 @@ class Queue:
 
             if is_bank:
                 metadata["priority"] = Priority.NORMAL
-                metadata["group_earliest_timestamp"] = MAX_TIMESTAMP
-                continue
+                
             if task_count[uid] >= 3:
                 metadata["group_earliest_timestamp"] = priority_timestamps[uid]
-                metadata["priority"]= Priority.HIGH
+                
             else:
                 metadata["group_earliest_timestamp"] = MAX_TIMESTAMP
-                metadata["priority"] = Priority.NORMAL
+                continue
             task.metadata= metadata
             # current_earliest = metadata.get("group_earliest_timestamp", MAX_TIMESTAMP)
             # raw_priority = metadata.get("priority")
@@ -306,4 +305,5 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
