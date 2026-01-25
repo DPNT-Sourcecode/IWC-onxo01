@@ -127,17 +127,17 @@ class Queue:
             metadata = task.metadata
             uid= task.user_id
             is_bank= task.provider == "bank_statements"
-
-            if is_bank:
-                metadata["priority"] = Priority.NORMAL
+            already_grouped= metadata.get("group_earliest_timestamp", MAX_TIMESTAMP) != MAX_TIMESTAMP
+            
                 
             if task_count[uid] >= 3:
                 metadata["group_earliest_timestamp"] = priority_timestamps[uid]
+                metadata["priority"] = Priority.NORMAL if is_bank else Priority.HIGH
                 
             else:
-                metadata["group_earliest_timestamp"] = MAX_TIMESTAMP
-                continue
-            task.metadata= metadata
+                if not already_grouped:
+                    metadata["group_earliest_timestamp"] = MAX_TIMESTAMP
+                    metadata["priority"]= Priority.NORMAL
             # current_earliest = metadata.get("group_earliest_timestamp", MAX_TIMESTAMP)
             # raw_priority = metadata.get("priority")
             # try:
@@ -168,7 +168,7 @@ class Queue:
             task_internal_age= (newest_timestamp-timestamp).total_seconds()
             is_bank_old= is_bank and task_internal_age >= 300
             
-            grouped_user= task_count.get(task.user_id, 0)>= 3
+            grouped_user= (task.metadata.get("group_earliest_timestamp", MAX_TIMESTAMP) != MAX_TIMESTAMP)
             
             # bank_new= 1 if (is_bank and not is_bank_old ) else 0
             # bank_old= 0 if is_bank_old else 1
@@ -177,7 +177,8 @@ class Queue:
                 and not is_bank_old
                 and (grouped_user or timestamp>global_earliest_stamp)
             )
-            effective_Ts= newest_timestamp if apply_bp else timestamp            
+            base_ts= earliest if grouped_user else timestamp
+            effective_Ts= newest_timestamp if apply_bp else base_ts            
             # old_bank_change= 1 if is_bank_old else 2
             
             return (
@@ -302,6 +303,7 @@ async def queue_worker():
         logger.info(f"Finished task: {task}")
 ```
 """
+
 
 
 
